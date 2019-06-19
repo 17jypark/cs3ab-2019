@@ -54,8 +54,9 @@ public class QuerstionController {
 		User sessionUser = (User)session.getAttribute("user");
 		Question question = questionService.getQuestionById(id);
 		User writer = question.getWriter();
-		if(sessionUser.equals(writer))
-			model.addAttribute("same", "same");
+		if(sessionUser != null)
+			if(sessionUser.equals(writer))
+				model.addAttribute("same", "samesame");
 		
 		model.addAttribute("question", question);
 		
