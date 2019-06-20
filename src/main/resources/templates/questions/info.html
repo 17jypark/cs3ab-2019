@@ -38,7 +38,7 @@
                      <ul class="blog-info-link mt-3 mb-4">
                      	<li><a href="#"><i class="far fa-user"></i> <span th:text="${question.writer.userId}"></span></a></li>
                         <li><a href="#"><i class="far fa-clock"></i> <span th:text="${#temporals.format(question.createTime, 'yyyy년 MM월 dd일 HH:mm')}"></span></a></li>
-                        <li><a href="#comment-area"><i class="far fa-comments"></i> 03 Comments</a></li>
+                        <li><a href="#comment-area"><i class="far fa-comments"></i> <span th:text="${answerSize}"></span> Comments</a></li>
                         <li th:if="${same}"><a th:href="@{'/questions/{id}/edit'(id=${question.id})}"><i class="far fa-edit"></i> Edit</a></li>
                         <form th:if="${same}" th:action="@{'/questions/{id}'(id=${id})}" th:method="delete">
                         	<button type="submit" class="button button-contactForm btn_4 btn-sm"> 삭제</button>
@@ -127,7 +127,7 @@
                   </div>
                </div>
                <div class="comments-area">
-                  <h4><a name="comment-area"></a>05 Comments</h4>
+                  <h4><a name="comment-area"></a><span th:text="${answerSize}"></span> Comments</h4>
                   <div class="comment-list" th:each="answer : ${question.answers}">
                      <div class="single-comment justify-content-between d-flex">
                         <div class="user justify-content-between d-flex">
@@ -146,8 +146,14 @@
                                     <p class="date"><span th:text="${#temporals.format(answer.createTime, 'yy년 MM월 dd일 HH:mm')}"></span></p>
                                  </div>
                                  <div class="reply-btn">
-                                    <a href="#" class="btn-reply text-uppercase">reply</a>
+                                 	&nbsp;
+                                    <a th:href="@{'/questions/{id}/answers/{id1}/edit'(id=${question.id},id1=${answer.id})}"><i class="far fa-edit"></i> Edit</a>
+                                 
                                  </div>
+                                 &nbsp;
+                                 <form th:action="@{'/questions/{id}/answers/{id1}'(id=${question.id},id1=${answer.id})}" th:method="delete">
+                        			 <button type="submit" class="button button-contactForm btn_4 btn-sm"> 삭제</button>
+                        		 </form>
                               </div>
                            </div>
                         </div>

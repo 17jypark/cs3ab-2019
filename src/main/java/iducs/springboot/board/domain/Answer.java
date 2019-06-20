@@ -4,14 +4,14 @@ import java.time.LocalDateTime;
 
 public class Answer {
 	private long id; // primary key
-	private Question question;
+	private Board question;
 	private String title;
 	private User writer;	
 	private String contents;
 	private LocalDateTime createTime;	
 	
 	public Answer() {}
-	public Answer(User writer, Question question, String contents) {
+	public Answer(User writer, Board question, String contents) {
 		super();
 		this.writer = writer;
 		this.question = question;
@@ -58,10 +58,10 @@ public class Answer {
 	public void setCreateTime(LocalDateTime createTime) {
 		this.createTime = createTime;
 	}
-	public Question getQuestion() {
+	public Board getQuestion() {
 		return question;
 	}
-	public void setQuestion(Question question) {
+	public void setQuestion(Board question) {
 		this.question = question;
 	}
 	public boolean isSameUser(User user, User writer) {

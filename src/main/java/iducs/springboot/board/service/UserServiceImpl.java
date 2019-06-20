@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -32,13 +35,34 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User getUserByUserId(String userId) {
-		UserEntity userEntity = userEntity = repository.findByUserId(userId);
+		UserEntity userEntity = repository.findByUserId(userId);
 		if(userEntity == null)
 			return null;
 		return userEntity.buildDomain();
 	}
 
+	public List<User> getUsers(PageRequest pageRequest) {
+		List<User> users = new ArrayList<User>();
+		Page<UserEntity> entities = repository.findAll(pageRequest);
+		for(UserEntity entity : entities) {
+			User user = entity.buildDomain();
+			users.add(user);
+		}
+		return users;
+	}
+	
 	@Override
+	public List<User> getUsers(Long pageNo) {
+		PageRequest pageRequest = PageRequest.of((int) (pageNo - 1), 3, new Sort(Sort.Direction.DESC, "id"));
+		Page<UserEntity> entities = repository.findAll(pageRequest);
+		List<User> users = new ArrayList<User>();
+		for(UserEntity entity : entities) {
+			User user = entity.buildDomain();
+			users.add(user);
+		}
+		return users;
+	}	
+	
 	public List<User> getUsers() {
 		List<User> users = new ArrayList<User>();
 		List<UserEntity> entities = repository.findAll();
@@ -48,7 +72,6 @@ public class UserServiceImpl implements UserService {
 		}
 		return users;
 	}
-
 	@Override
 	public List<User> getUsersByName(String name) {
 		// TODO Auto-generated method stub
@@ -86,5 +109,5 @@ public class UserServiceImpl implements UserService {
 		UserEntity entity = new UserEntity();
 		entity.buildEntity(user);
 		repository.delete(entity);
-	}		
+	}
 }

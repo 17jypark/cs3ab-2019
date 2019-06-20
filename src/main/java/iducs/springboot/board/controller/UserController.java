@@ -3,8 +3,6 @@ package iducs.springboot.board.controller;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,10 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import iducs.springboot.board.domain.User;
-import iducs.springboot.board.exception.ResourceNotFoundException;
-import iducs.springboot.board.repository.UserRepository;
 import iducs.springboot.board.service.UserService;
-import iducs.springboot.board.util.HttpSessionUtils;
 
 @Controller
 @RequestMapping("/users")
@@ -33,22 +28,17 @@ public class UserController {
 	public String createUser(@Valid User formUser, Model model) {
 		userService.saveUser(formUser); 
 		model.addAttribute("user", formUser);
-		return "/users/welcome";
+		return "redirect:/users";
 	}	
 	@GetMapping("")
-	public String getAllUser(Model model, HttpSession session) {
-		User sessionUser = (User) session.getAttribute("user");
-		if(HttpSessionUtils.isLogined(sessionUser))
-				return "redirect:/users/login-form";
-		model.addAttribute("users", userService.getUsers());
+	public String getUsers(Model model, HttpSession session, Long pageNo) { //@PathVariable(value = "pageNo") Long pageNo) {
+		if(pageNo == null)
+			pageNo = new Long(1);
+		model.addAttribute("users", userService.getUsers(pageNo));
 		return "/users/list";
-		
 	}	
 	@GetMapping("/{id}")
-	public String getUserById(@PathVariable(value = "id") Long id, Model model, HttpSession session) {
-		User sessionUser = (User) session.getAttribute("user");
-		if(HttpSessionUtils.isLogined(sessionUser))
-				return "redirect:/users/login-form";
+	public String getUserById(@PathVariable(value = "id") Long id, Model model) {
 		User user = userService.getUserById(id);
 		model.addAttribute("user", user);
 		return "/users/info";
@@ -66,10 +56,11 @@ public class UserController {
 		return "/users/info";
 	}	
 	@DeleteMapping("/{id}")
-	public String deleteUserById(@PathVariable(value = "id") Long id, @Valid User formUser, Model model) {
+	public String deleteUserById(@PathVariable(value = "id") Long id, @Valid User formUser, Model model, HttpSession session) {
 		userService.deleteUser(formUser);
 		model.addAttribute("name", formUser.getName());
-		return "/users/withdrawal";
+		session.invalidate();
+		return "/index";
 	}
 	
 	/*
@@ -90,7 +81,6 @@ public class UserController {
 	@GetMapping("/users/n")
 	public String getEmployeeByName(@Param(value = "name") String name, Model model)
 			throws ResourceNotFoundException {
-		System.out.println(name);
 		List<User> users = userRepo.findByNameOrderByIdAsc(name);
 		model.addAttribute("users", users);
 		return "user-list";

@@ -19,23 +19,27 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import iducs.springboot.board.domain.Question;
+import iducs.springboot.board.domain.Board;
 import iducs.springboot.board.domain.User;
 import iducs.springboot.board.exception.ResourceNotFoundException;
 import iducs.springboot.board.repository.UserRepository;
-import iducs.springboot.board.service.QuestionService;
+import iducs.springboot.board.service.BoardService;
 import iducs.springboot.board.service.UserService;
 import iducs.springboot.board.util.HttpSessionUtils;
 
 @Controller
 @RequestMapping("/questions")
-public class QuerstionController {
-	@Autowired QuestionService questionService; // 의존성 주입(Dependency Injection) : 
+public class BoardController {
+	@Autowired BoardService questionService; // 의존성 주입(Dependency Injection) : 
 	
 	@GetMapping("")
-	public String getAllQues(Model model, HttpSession session) {
-		List<Question> questions = questionService.getQuestions();
-		model.addAttribute("questions", questions);
+	public String getAllQues(Model model, HttpSession session, Long pageNo) {
+		if(pageNo == null)
+			pageNo = new Long(1);
+		
+		model.addAttribute("questions", questionService.getQuestions(pageNo));
+		int count=questionService.getQuestions().size();
+		model.addAttribute("size", count);
 		return "/questions/list"; 
 	}	
 	
@@ -43,7 +47,7 @@ public class QuerstionController {
 	// public String createUser(Question question, Model model, HttpSession session) {
 	public String createQuestions(String title, String contents, Model model, HttpSession session) {
 		User sessionUser = (User) session.getAttribute("user");
-		Question newQuestion = new Question(title, sessionUser, contents);		
+		Board newQuestion = new Board(title, sessionUser, contents);		
 		// Question newQuestion = new Question(question.getTitle(), writer, question.getContents());	
 		questionService.saveQuestion(newQuestion);
 		return "redirect:/questions"; // get 방식으로  리다이렉션 - Controller를 통해 접근
@@ -52,12 +56,13 @@ public class QuerstionController {
 	@GetMapping("/{id}")
 	public String getQuestionById(@PathVariable(value = "id") Long id, Model model, HttpSession session) {
 		User sessionUser = (User)session.getAttribute("user");
-		Question question = questionService.getQuestionById(id);
+		Board question = questionService.getQuestionById(id);
 		User writer = question.getWriter();
 		if(sessionUser != null)
 			if(sessionUser.equals(writer))
 				model.addAttribute("same", "samesame");
-		
+		int answerSize = question.getAnswers().size();
+		model.addAttribute("answerSize", answerSize);
 		model.addAttribute("question", question);
 		
 		
@@ -65,13 +70,13 @@ public class QuerstionController {
 	}
 	@GetMapping("/{id}/form")
 	public String getUpdateForm(@PathVariable(value = "id") Long id, Model model) {
-		Question question = questionService.getQuestionById(id);
+		Board question = questionService.getQuestionById(id);
 		model.addAttribute("question", question);
 		return "/questions/info";
 	}
 	@PutMapping("/{id}")
-	public String updateQuestionById(@PathVariable(value = "id") Long id, @Valid Question formQuestion, String title, String contents, Model model) {
-		Question question = questionService.getQuestionById(id);
+	public String updateQuestionById(@PathVariable(value = "id") Long id, @Valid Board formQuestion, String title, String contents, Model model) {
+		Board question = questionService.getQuestionById(id);
 		question.setTitle(formQuestion.getTitle());
 		question.setContents(formQuestion.getContents());
 		
@@ -82,7 +87,7 @@ public class QuerstionController {
 	}
 	@DeleteMapping("/{id}")
 	public String deleteQuestionById(@PathVariable(value = "id") Long id, Model model) {
-		Question question = questionService.getQuestionById(id);
+		Board question = questionService.getQuestionById(id);
 		questionService.deleteQuestion(question);
 		model.addAttribute("userId", question.getWriter().getUserId());
 		return "redirect:/questions";
@@ -94,7 +99,7 @@ public class QuerstionController {
 		if(HttpSessionUtils.isLogined(writer))
 				return "redirect:/users/login-form";
 		model.addAttribute("writer", writer);
-		Question question = questionService.getQuestionById(id);
+		Board question = questionService.getQuestionById(id);
 		model.addAttribute("question", question);
 		
 		return "/questions/edit";

@@ -36,11 +36,11 @@
                                     <a class="nav-link" href="/users/form">Register</a>
                                 </li>
                                 <li th:if="${session.user}" class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="blog.html" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <a class="nav-link dropdown-toggle" href="/questions?pageNo=1" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Questions
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item" href="/questions">Questions</a>
+                                        <a class="dropdown-item" href="/questions?pageNo=1">Questions</a>
                                         <a class="dropdown-item" href="/questions/form">Write a Question</a>
                                     </div>
                                 </li>

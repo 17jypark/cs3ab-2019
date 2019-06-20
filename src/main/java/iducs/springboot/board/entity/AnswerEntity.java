@@ -25,8 +25,8 @@ public class AnswerEntity {
 	private UserEntity writer;
 	
 	@ManyToOne
-	@JoinColumn(name="fk_answer_question")
-	private QuestionEntity question;
+	@JoinColumn(name="fk_answer_board")
+	private BoardEntity question;
 
 	@Lob
 	private String contents;
@@ -48,7 +48,7 @@ public class AnswerEntity {
 		userEntity.buildEntity(answer.getWriter());
 		writer = userEntity;
 		
-		QuestionEntity quesitonEntity = new QuestionEntity();
+		BoardEntity quesitonEntity = new BoardEntity();
 		quesitonEntity.buildEntity(answer.getQuestion());
 		question = quesitonEntity;
 		
